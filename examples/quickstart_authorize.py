@@ -19,6 +19,11 @@ async def main() -> None:
         open_browser=True,
     )
     print("Integration authorized.")
+    print("Access token:", sdk.integration.access_token)
+    print("Refresh token:", sdk.integration.refresh_token)
+    print("Expires at:", sdk.integration.expires_at)
+    print("Scopes:", sdk.integration.scopes)
+    
 
     target = os.environ.get("WEBEX_WEBHOOK_TARGET_URL")
     if target:
