@@ -42,9 +42,9 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jozanini-creator/byova-sdk-python"
-Documentation = "https://github.com/jozanini-creator/byova-sdk-python#readme"
-Repository = "https://github.com/jozanini-creator/byova-sdk-python"
+Homepage = "https://github.com/Joezanini/byova-sdk-python"
+Documentation = "https://github.com/Joezanini/byova-sdk-python#readme"
+Repository = "https://github.com/Joezanini/byova-sdk-python"
 
 [tool.hatch.version]
 source = "vcs"
