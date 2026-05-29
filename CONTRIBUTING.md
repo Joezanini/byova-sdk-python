@@ -30,9 +30,23 @@ ruff format src tests
 
 ## Release process (maintainers)
 
-1. Update version in `pyproject.toml` and `src/webex_byova/__init__.py`.
-2. Tag release: `git tag v0.x.x`
-3. GitHub Actions publishes to PyPI via trusted publishing on tag push.
+1. Merge changes to `main`.
+2. Create and push a version tag (version is derived from the tag via hatch-vcs):
+
+   ```bash
+   git tag v0.x.x
+   git push origin v0.x.x
+   ```
+
+3. GitHub Actions runs tests, builds the package, and publishes to PyPI via trusted publishing.
+
+### One-time PyPI setup
+
+- Create a GitHub environment named `pypi.org`.
+- Configure [PyPI trusted publishing](https://docs.pypi.org/trusted-publishers/) for this repository:
+  - Workflow: `release.yml`
+  - Environment: `pypi.org`
+- Optionally set repository variable `PYPI_REPOSITORY_URL` to `https://test.pypi.org/legacy/` for TestPyPI dry runs.
 
 ## Code style
 

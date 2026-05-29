@@ -1,10 +1,10 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "webex-byova"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Python SDK for Webex Contact Center BYOVA / BYODS — Data Sources, Service App tokens, and Integration OAuth"
 readme = "README.md"
 license = "MIT"
@@ -45,6 +45,12 @@ docs = [
 Homepage = "https://github.com/jozanini-creator/byova-sdk-python"
 Documentation = "https://github.com/jozanini-creator/byova-sdk-python#readme"
 Repository = "https://github.com/jozanini-creator/byova-sdk-python"
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/webex_byova/_version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/webex_byova"]

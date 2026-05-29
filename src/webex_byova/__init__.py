@@ -10,7 +10,7 @@ from webex_byova.exceptions import (
     WebexBYOVAError,
 )
 
-__version__ = "0.1.0"
+from webex_byova._version import __version__
 
 __all__ = [
     "BYOVA",

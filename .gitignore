@@ -15,4 +15,5 @@ venv/
 htmlcov/
 .coverage
 site/
+src/webex_byova/_version.py
 

@@ -1,27 +1,50 @@
-name: CI
+name: Build and Test
 
 on:
   push:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
+  workflow_call:
 
 jobs:
-  test:
+  build-and-test:
+    name: Build and Test
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
+          pip install build
+
       - name: Ruff
         run: ruff check src tests
+
       - name: Pytest
         run: pytest tests/ -v
+
+      - name: Build
+        if: matrix.python-version == '3.12'
+        run: python -m build
+
+      - name: Upload Distribution Files
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: distribution-files
+          path: dist/
