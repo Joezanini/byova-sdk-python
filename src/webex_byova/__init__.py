@@ -1,5 +1,6 @@
 """Webex BYOVA / BYODS Python SDK."""
 
+from webex_byova._version import __version__
 from webex_byova.client import BYOVA
 from webex_byova.config import BYOVAConfig
 from webex_byova.exceptions import (
@@ -9,8 +10,6 @@ from webex_byova.exceptions import (
     ValidationError,
     WebexBYOVAError,
 )
-
-from webex_byova._version import __version__
 
 __all__ = [
     "BYOVA",
