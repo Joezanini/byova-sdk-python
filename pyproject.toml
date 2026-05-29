@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "webex-byova"
+version = "0.1.0"
+description = "Python SDK for Webex Contact Center BYOVA / BYODS — Data Sources, Service App tokens, and Integration OAuth"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.10"
+authors = [{ name = "Webex BYOVA SDK Contributors" }]
+keywords = ["webex", "byova", "byods", "contact-center", "virtual-agent"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "httpx>=0.27.0",
+    "pydantic>=2.0",
+    "PyJWT[crypto]>=2.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24",
+    "respx>=0.21",
+    "ruff>=0.6",
+    "mypy>=1.11",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.26",
+]
+
+[project.urls]
+Homepage = "https://github.com/jozanini-creator/byova-sdk-python"
+Documentation = "https://github.com/jozanini-creator/byova-sdk-python#readme"
+Repository = "https://github.com/jozanini-creator/byova-sdk-python"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/webex_byova"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+packages = ["webex_byova"]

@@ -1,0 +1,19 @@
+site_name: webex-byova
+site_description: Python SDK for Webex BYOVA / BYODS
+theme:
+  name: material
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Credentials: credentials.md
+  - Integration OAuth: integration-oauth.md
+  - Automated Token Flow: automated-token-flow.md
+  - Authentication: authentication.md
+  - Data Sources: data-sources.md
+  - JWS Verification: jws-verification.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [../src]
