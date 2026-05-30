@@ -17,6 +17,7 @@ from webex_byova.models.webhook import (
     ServiceAppAuthorizedResult,
     ServiceAppWebhookEvent,
     WebhookRegistration,
+    WebhookUpdate,
 )
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     "ServiceAppWebhookEvent",
     "ServiceAppAuthorizedResult",
     "WebhookRegistration",
+    "WebhookUpdate",
 ]
