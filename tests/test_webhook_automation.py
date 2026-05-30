@@ -5,6 +5,7 @@ import pytest
 import respx
 
 from webex_byova.auth.utils import derive_application_id
+from webex_byova.models.webhook import WebhookUpdate
 
 
 @respx.mock
@@ -96,3 +97,139 @@ async def test_ensure_webhooks(sdk) -> None:
     created = await sdk.webhooks.aensure_service_app_webhooks("https://example.com/hook")
     assert len(created) == 2
     assert route.call_count == 2
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_ensure_webhooks_idempotent(sdk) -> None:
+    respx.get("https://webexapis.com/v1/webhooks").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "items": [
+                    {
+                        "id": "wh-1",
+                        "targetUrl": "https://example.com/hook",
+                        "resource": "serviceApp",
+                        "event": "authorized",
+                    },
+                    {
+                        "id": "wh-2",
+                        "targetUrl": "https://example.com/hook",
+                        "resource": "serviceApp",
+                        "event": "deauthorized",
+                    },
+                ]
+            },
+        )
+    )
+    route = respx.post("https://webexapis.com/v1/webhooks")
+    created = await sdk.webhooks.aensure_service_app_webhooks("https://example.com/hook")
+    assert len(created) == 0
+    assert route.call_count == 0
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_webhook_get_update_delete(sdk) -> None:
+    respx.get("https://webexapis.com/v1/webhooks/wh-1").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "id": "wh-1",
+                "name": "BYOVA Service App authorized",
+                "targetUrl": "https://example.com/hook",
+                "resource": "serviceApp",
+                "event": "authorized",
+                "status": "active",
+            },
+        )
+    )
+    put_route = respx.put("https://webexapis.com/v1/webhooks/wh-1").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "id": "wh-1",
+                "name": "BYOVA Service App authorized",
+                "targetUrl": "https://example.com/new-hook",
+                "resource": "serviceApp",
+                "event": "authorized",
+                "status": "active",
+            },
+        )
+    )
+    delete_route = respx.delete("https://webexapis.com/v1/webhooks/wh-1").mock(
+        return_value=httpx.Response(204)
+    )
+
+    wh = await sdk.webhooks.aget("wh-1")
+    assert wh.id == "wh-1"
+    assert wh.resource == "serviceApp"
+    assert wh.event == "authorized"
+
+    updated = await sdk.webhooks.aupdate(
+        "wh-1",
+        WebhookUpdate(
+            name="BYOVA Service App authorized",
+            target_url="https://example.com/new-hook",
+        ),
+    )
+    assert updated.target_url == "https://example.com/new-hook"
+    assert put_route.call_count == 1
+    assert put_route.calls.last.request.content == (
+        b'{"name":"BYOVA Service App authorized","targetUrl":"https://example.com/new-hook"}'
+    )
+
+    await sdk.webhooks.adelete("wh-1")
+    assert delete_route.call_count == 1
+
+
+@respx.mock
+@pytest.mark.asyncio
+async def test_list_service_app_webhooks(sdk) -> None:
+    respx.get("https://webexapis.com/v1/webhooks").mock(
+        return_value=httpx.Response(
+            200,
+            json={
+                "items": [
+                    {
+                        "id": "wh-1",
+                        "targetUrl": "https://example.com/hook",
+                        "resource": "serviceApp",
+                        "event": "authorized",
+                    },
+                    {
+                        "id": "wh-2",
+                        "targetUrl": "https://example.com/hook",
+                        "resource": "serviceApp",
+                        "event": "deauthorized",
+                    },
+                    {
+                        "id": "wh-3",
+                        "targetUrl": "https://example.com/other",
+                        "resource": "messages",
+                        "event": "created",
+                    },
+                    {
+                        "id": "wh-4",
+                        "targetUrl": "https://example.com/hook",
+                        "resource": "serviceApp",
+                        "event": "created",
+                    },
+                ]
+            },
+        )
+    )
+
+    all_sa = await sdk.webhooks.alist_service_app_webhooks()
+    assert len(all_sa) == 2
+    assert {w.id for w in all_sa} == {"wh-1", "wh-2"}
+
+    by_url = await sdk.webhooks.alist_service_app_webhooks(
+        target_url="https://example.com/hook"
+    )
+    assert len(by_url) == 2
+
+    authorized = await sdk.webhooks.alist_service_app_webhooks(event="authorized")
+    assert len(authorized) == 1
+    assert authorized[0].id == "wh-1"

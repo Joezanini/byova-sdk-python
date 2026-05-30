@@ -17,6 +17,25 @@ class WebhookRegistration(BaseModel):
     target_url: str | None = Field(None, alias="targetUrl")
     resource: str | None = None
     event: str | None = None
+    filter: str | None = None
+    secret: str | None = None
+    status: str | None = None
+    created: str | None = None
+    owned_by: str | None = Field(None, alias="ownedBy")
+
+
+class WebhookUpdate(BaseModel):
+    """Payload for PUT /webhooks/{id}."""
+
+    model_config = ConfigDict(populate_by_name=True, exclude_none=True)
+
+    name: str
+    target_url: str = Field(alias="targetUrl")
+    secret: str | None = None
+    status: str | None = None
+
+    def model_dump_api(self) -> dict[str, Any]:
+        return self.model_dump(by_alias=True, exclude_none=True)
 
 
 class ServiceAppWebhookEvent(BaseModel):
