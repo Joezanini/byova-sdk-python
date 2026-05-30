@@ -12,6 +12,13 @@ from webex_byova.config import BYOVAConfig
 from webex_byova.exceptions import AuthenticationError
 from webex_byova.models.auth import IntegrationCredentials, OAuthTokens
 
+DEFAULT_INTEGRATION_SCOPES: list[str] = [
+    "spark:all",
+    "spark:applications_token",
+    "application:webhooks_write",
+    "application:webhooks_read",
+]
+
 
 class IntegrationTokenManager:
     """Manage Integration OAuth tokens (developer-initiated flow)."""
@@ -34,17 +41,18 @@ class IntegrationTokenManager:
 
     def get_authorization_url(
         self,
-        scopes: list[str],
+        scopes: list[str] | None = None,
         *,
         state: str | None = None,
     ) -> tuple[str, str]:
         """Build authorization URL. Returns (url, state)."""
+        resolved_scopes = scopes if scopes is not None else DEFAULT_INTEGRATION_SCOPES
         csrf = state or secrets.token_urlsafe(16)
         params = {
             "client_id": self._credentials.client_id,
             "response_type": "code",
             "redirect_uri": self._credentials.redirect_uri,
-            "scope": " ".join(scopes),
+            "scope": " ".join(resolved_scopes),
             "state": csrf,
         }
         url = f"{self._config.authorize_url}?{urlencode(params)}"
@@ -126,7 +134,7 @@ class IntegrationTokenManager:
 
     def authorize(
         self,
-        scopes: list[str],
+        scopes: list[str] | None = None,
         *,
         open_browser: bool = True,
         timeout: float = 300.0,
@@ -149,7 +157,7 @@ class IntegrationTokenManager:
 
     async def aauthorize(
         self,
-        scopes: list[str],
+        scopes: list[str] | None = None,
         *,
         open_browser: bool = True,
         timeout: float = 300.0,

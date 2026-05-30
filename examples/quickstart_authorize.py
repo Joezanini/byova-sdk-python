@@ -10,14 +10,7 @@ async def main() -> None:
     sdk = BYOVA.from_env()
 
     print("Opening browser for Integration OAuth (developer authorization)...")
-    await sdk.integration.aauthorize(
-        scopes=[
-            "spark:applications_token",
-            "application:webhooks_write",
-            "application:webhooks_read",
-        ],
-        open_browser=True,
-    )
+    await sdk.integration.aauthorize(open_browser=True)
     print("Integration authorized.")
     print("Access token:", sdk.integration.access_token)
     print("Refresh token:", sdk.integration.refresh_token)

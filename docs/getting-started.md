@@ -4,6 +4,7 @@
 
 1. A [Webex Developer](https://developer.webex.com/) account
 2. A **Webex Integration** with scopes:
+   - `spark:all`
    - `spark:applications_token`
    - `application:webhooks_write`
    - `application:webhooks_read`
@@ -31,13 +32,7 @@ sdk = BYOVA(
 )
 
 async def setup():
-    await sdk.integration.aauthorize(
-        scopes=[
-            "spark:applications_token",
-            "application:webhooks_write",
-            "application:webhooks_read",
-        ],
-    )
+    await sdk.integration.aauthorize()
     await sdk.webhooks.aensure_service_app_webhooks(
         "https://your-server.example.com/webhooks/webex"
     )

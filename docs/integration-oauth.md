@@ -6,15 +6,12 @@ The developer authorizes the **Integration** on their own behalf. The SDK provid
 
 ```python
 tokens = await sdk.integration.aauthorize(
-    scopes=[
-        "spark:applications_token",
-        "application:webhooks_write",
-        "application:webhooks_read",
-    ],
     open_browser=True,
     timeout=300,
 )
 ```
+
+This uses the default Integration scopes (`spark:all`, `spark:applications_token`, `application:webhooks_write`, `application:webhooks_read`). Override with `scopes=[...]` if needed.
 
 This will:
 

@@ -5,7 +5,7 @@ import pytest
 import respx
 
 from webex_byova._http import HttpClient
-from webex_byova.auth.integration import IntegrationTokenManager
+from webex_byova.auth.integration import DEFAULT_INTEGRATION_SCOPES, IntegrationTokenManager
 from webex_byova.auth.storage import InMemoryTokenStorage
 from webex_byova.config import BYOVAConfig
 from webex_byova.models.auth import IntegrationCredentials, OAuthTokens
@@ -31,6 +31,17 @@ def test_get_authorization_url(integration_manager: IntegrationTokenManager) -> 
     assert "webexapis.com" in url
     assert "client_id=int-id" in url
     assert state
+
+
+@respx.mock
+def test_get_authorization_url_default_scopes(
+    integration_manager: IntegrationTokenManager,
+) -> None:
+    url, state = integration_manager.get_authorization_url()
+    assert "webexapis.com" in url
+    assert state
+    for scope in DEFAULT_INTEGRATION_SCOPES:
+        assert scope.replace(":", "%3A") in url
 
 
 @respx.mock

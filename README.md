@@ -31,14 +31,7 @@ sdk = BYOVA(
 
 async def main():
   # Developer authorizes Integration (not customer admin)
-  await sdk.integration.aauthorize(
-      scopes=[
-          "spark:applications_token",
-          "application:webhooks_write",
-          "application:webhooks_read",
-      ],
-      open_browser=True,
-  )
+  await sdk.integration.aauthorize(open_browser=True)
 
   await sdk.webhooks.aensure_service_app_webhooks(
       target_url="https://your-app.example.com/webhooks/webex",
