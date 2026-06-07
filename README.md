@@ -2,12 +2,18 @@
 
 Python SDK for **Webex Contact Center BYOVA** and the foundational **Bring Your Own Data Source (BYODS)** APIs.
 
-Simplify Service App token management, Integration OAuth, DataSource CRUD, schema discovery, and JWS verification.
+Simplify Service App token management, Integration OAuth, DataSource CRUD, schema discovery, JWS verification, and BYOVA gRPC media streaming.
 
 ## Install
 
 ```bash
 pip install webex-byova
+```
+
+For the gRPC media server (voice virtual agent streaming), install the optional dependencies:
+
+```bash
+pip install "webex-byova[media]"
 ```
 
 ## Quick start

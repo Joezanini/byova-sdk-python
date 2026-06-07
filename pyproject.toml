@@ -5,12 +5,12 @@ build-backend = "hatchling.build"
 [project]
 name = "webex-byova"
 dynamic = ["version"]
-description = "Python SDK for Webex Contact Center BYOVA / BYODS — Data Sources, Service App tokens, and Integration OAuth"
+description = "Python SDK for Webex Contact Center BYOVA / BYODS — Data Sources, Service App tokens, Integration OAuth, and gRPC media server"
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.10"
 authors = [{ name = "Webex BYOVA SDK Contributors" }]
-keywords = ["webex", "byova", "byods", "contact-center", "virtual-agent"]
+keywords = ["webex", "byova", "byods", "contact-center", "virtual-agent", "grpc", "media-server"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
