@@ -25,9 +25,11 @@ async def test_handle_authorized_webhook(sdk) -> None:
     import base64
 
     org_uuid = "63b02f90-9cc6-43b8-aa6d-cad425ac554c"
-    encoded_org = base64.urlsafe_b64encode(
-        f"ciscospark://us/ORGANIZATION/{org_uuid}".encode()
-    ).decode().rstrip("=")
+    encoded_org = (
+        base64.urlsafe_b64encode(f"ciscospark://us/ORGANIZATION/{org_uuid}".encode())
+        .decode()
+        .rstrip("=")
+    )
 
     result = await sdk.ahandle_service_app_webhook(
         {
@@ -225,9 +227,7 @@ async def test_list_service_app_webhooks(sdk) -> None:
     assert len(all_sa) == 2
     assert {w.id for w in all_sa} == {"wh-1", "wh-2"}
 
-    by_url = await sdk.webhooks.alist_service_app_webhooks(
-        target_url="https://example.com/hook"
-    )
+    by_url = await sdk.webhooks.alist_service_app_webhooks(target_url="https://example.com/hook")
     assert len(by_url) == 2
 
     authorized = await sdk.webhooks.alist_service_app_webhooks(event="authorized")

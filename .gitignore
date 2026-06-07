@@ -17,6 +17,7 @@ htmlcov/
 site/
 docs/site/
 src/webex_byova/_version.py
+src/webex_byova/media/_internal/generated/
 
 # Cursor IDE (local rules, skills, and config)
 .cursor/
@@ -24,4 +25,5 @@ src/webex_byova/_version.py
 
 # Spec Kit / Specify (local tooling, templates, and config)
 .specify/
+specs/
 

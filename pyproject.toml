@@ -28,12 +28,17 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+media = [
+    "grpcio>=1.60",
+    "websockets>=12",
+]
 dev = [
     "pytest>=8.0",
     "pytest-asyncio>=0.24",
     "respx>=0.21",
     "ruff>=0.6",
     "mypy>=1.11",
+    "grpcio-tools>=1.60",
 ]
 docs = [
     "mkdocs>=1.6",
@@ -52,6 +57,10 @@ source = "vcs"
 [tool.hatch.build.hooks.vcs]
 version-file = "src/webex_byova/_version.py"
 
+[tool.hatch.build.hooks.custom]
+path = "hatch_build.py"
+dependencies = ["grpcio-tools>=1.60"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/webex_byova"]
 
@@ -62,6 +71,9 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+exclude = [
+    "src/webex_byova/media/_internal/generated",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP"]
@@ -70,3 +82,15 @@ select = ["E", "F", "I", "UP"]
 python_version = "3.10"
 strict = true
 packages = ["webex_byova"]
+
+[[tool.mypy.overrides]]
+module = "webex_byova.media._internal.generated.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = [
+    "grpc",
+    "grpc.*",
+    "google.protobuf.*",
+]
+ignore_missing_imports = true

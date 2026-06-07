@@ -13,7 +13,9 @@ def test_decode_org_id_roundtrip_style() -> None:
     import base64
 
     org_uuid = "63b02f90-9cc6-43b8-aa6d-cad425ac554c"
-    encoded = base64.urlsafe_b64encode(
-        f"ciscospark://us/ORGANIZATION/{org_uuid}".encode()
-    ).decode().rstrip("=")
+    encoded = (
+        base64.urlsafe_b64encode(f"ciscospark://us/ORGANIZATION/{org_uuid}".encode())
+        .decode()
+        .rstrip("=")
+    )
     assert decode_org_id(encoded) == org_uuid
