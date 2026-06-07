@@ -1,8 +1,10 @@
 # Error Handling
 
-The SDK raises typed exceptions derived from `WebexBYOVAError`. All exceptions carry optional `status_code` and `body` attributes from the Webex API response.
+The SDK raises typed exceptions derived from `WebexBYOVAError`. All exceptions carry optional `status_code` and `body` attributes from the Webex API response where applicable.
 
 ## Exception hierarchy
+
+### BYODS and platform
 
 ```
 WebexBYOVAError
@@ -14,6 +16,22 @@ WebexBYOVAError
 ├── OAuthRedirectTimeout     (redirect listener timeout)
 └── OrgNotRegisteredError    (no tokens for org)
 ```
+
+### Media server (`webex_byova.media`)
+
+Requires `pip install webex-byova[media]`.
+
+```
+WebexBYOVAError
+└── MediaServerError
+    ├── MediaConfigError           (invalid MediaServerConfig)
+    ├── DuplicateTurnStreamError   (concurrent turn stream rejected)
+    ├── PromptValidationError      (invalid prompt audio/format)
+    ├── ProxyConnectionError       (WebSocket backend unreachable)
+    └── ProxyBufferOverflowError   (proxy buffer limit exceeded)
+```
+
+See [API Reference: Exceptions](../api/exceptions.md) for generated docstrings.
 
 ## Common exceptions
 
@@ -55,6 +73,29 @@ The local redirect listener timed out during `aauthorize()`. Increase `timeout` 
 ### `ValidationError`
 
 Raised for invalid webhook payloads or API validation errors. Inspect `exc.body` for Webex error details.
+
+### Media server errors
+
+Register an `error` handler on `BYOVAMediaServer` for runtime failures inside your callbacks:
+
+```python
+@server.on("error")
+async def on_error(event, session, turn):
+    print(event.message)
+```
+
+Configuration problems raise before the server starts:
+
+```python
+from webex_byova.media.exceptions import MediaConfigError, ProxyConnectionError
+
+try:
+    server = BYOVAMediaServer.from_env()
+except MediaConfigError as exc:
+    print(f"Invalid media config: {exc}")
+```
+
+During proxied sessions, a unreachable WebSocket backend raises `ProxyConnectionError`. Tune buffer limits if you see `ProxyBufferOverflowError` — see [WebSocket Proxy](../media-server/proxy.md).
 
 ## Example
 

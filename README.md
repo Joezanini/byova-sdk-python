@@ -16,7 +16,7 @@ For the gRPC media server (voice virtual agent streaming), install the optional 
 pip install "webex-byova[media]"
 ```
 
-## Quick start
+## Quick start (BYODS)
 
 ```python
 import asyncio
@@ -54,6 +54,39 @@ client = await sdk.aget_client_for_org(result.org_id)
 sources = await client.data_sources.alist()
 ```
 
+## Quick start (media server)
+
+Requires `pip install "webex-byova[media]"`:
+
+```python
+import asyncio
+from webex_byova.media import BYOVAMediaServer, MediaServerConfig
+
+async def main():
+    server = BYOVAMediaServer(MediaServerConfig(port=50051, verify_tokens=False))
+
+    @server.on("session_start")
+    async def greet(session, turn):
+        await turn.play_prompt(text="Hello from webex-byova")
+
+    async with server:
+        await server._grpc_server.wait_for_termination()
+
+asyncio.run(main())
+```
+
+See [Media Server Quickstart](https://joezanini.github.io/byova-sdk-python/media-server/quickstart/) and `examples/media_server_minimal.py`.
+
+## Examples
+
+| Area | Scripts |
+|------|---------|
+| OAuth / webhooks | `quickstart_authorize.py`, `webhook_handler_fastapi.py` |
+| Sandbox BYODS | `quickstart_manual_token.py` |
+| Voice / media | `media_server_minimal.py`, `media_server_multiturn.py`, `media_server_dtmf.py`, `media_server_proxy.py`, `byods_and_media_combined.py` |
+
+Full catalog: [Examples guide](https://joezanini.github.io/byova-sdk-python/guides/examples/).
+
 ## Environment variables
 
 ```bash
@@ -64,18 +97,30 @@ export WEBEX_SA_CLIENT_SECRET=...
 export WEBEX_INTEGRATION_REDIRECT_URI=http://127.0.0.1:8765/callback
 ```
 
+Media server (optional):
+
+```bash
+export WEBEX_MEDIA_HOST=0.0.0.0
+export WEBEX_MEDIA_PORT=50051
+```
+
 ```python
 sdk = BYOVA.from_env()
+server = BYOVAMediaServer.from_env()  # requires [media]
 ```
 
 ## Documentation
 
 Full documentation: **[joezanini.github.io/byova-sdk-python](https://joezanini.github.io/byova-sdk-python/)**
 
+- [Getting Started](https://joezanini.github.io/byova-sdk-python/getting-started/)
+- [Media Server Overview](https://joezanini.github.io/byova-sdk-python/media-server/)
+- [API: webex_byova.media](https://joezanini.github.io/byova-sdk-python/api/media/)
+
 Build and preview locally:
 
 ```bash
-pip install -e ".[docs]"
+pip install -e ".[docs,media]"
 mkdocs serve -f docs/mkdocs.yml   # http://127.0.0.1:8000
 ```
 

@@ -28,6 +28,16 @@ sequenceDiagram
 5. Call `sdk.ahandle_service_app_webhook(payload)` — SDK fetches and stores org tokens.
 6. Use `aget_client_for_org(org_id)` for DataSource CRUD.
 
+## Voice (media server)
+
+For BYOVA voice integrations, add a gRPC media server after org tokens are stored:
+
+1. Register a Voice Virtual Agent data source (schema `5397013b-7920-4ffc-807c-e8a3e0a18f43`) pointing to your server host/port.
+2. Run `BYOVAMediaServer` with handler callbacks — see [Media Server Quickstart](media-server/quickstart.md).
+3. Optionally run REST webhooks and the media server in one process — see [Deployment](media-server/deployment.md#coexistence-with-byods) and `examples/byods_and_media_combined.py`.
+
+The media server reuses the same JWS verification infrastructure as BYODS when `verify_tokens=True`.
+
 ## Deauthorization
 
 On `deauthorized`, `handle_service_app_webhook` removes stored tokens for that org.

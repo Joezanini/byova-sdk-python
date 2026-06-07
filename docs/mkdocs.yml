@@ -42,6 +42,7 @@ nav:
       - Deployment: media-server/deployment.md
   - API Reference:
       - webex_byova: api/webex_byova.md
+      - webex_byova.media: api/media.md
       - webex_byova.auth: api/auth.md
       - webex_byova.models: api/models.md
       - webex_byova.resources: api/resources.md

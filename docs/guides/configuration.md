@@ -1,5 +1,7 @@
 # Configuration
 
+## BYOVA REST client
+
 Global SDK behavior is controlled via `BYOVAConfig`:
 
 ```python
@@ -12,7 +14,7 @@ config = BYOVAConfig(
 sdk = BYOVA(integration=..., service_app=..., config=config)
 ```
 
-## Fields
+### Fields
 
 | Field | Default | Description |
 |-------|---------|-------------|
@@ -24,7 +26,7 @@ sdk = BYOVA(integration=..., service_app=..., config=config)
 | `region` | `"us"` | Active region for JWK lookup (`us` or `eu`) |
 | `timeout` | `30.0` | HTTP request timeout in seconds |
 
-## US vs EU regions
+### US vs EU regions
 
 Set `region="eu"` for European deployments. This selects the EU JWK endpoint for JWS verification:
 
@@ -36,7 +38,7 @@ claims = await sdk.averify_jws_token(jws_token)
 
 See [JWS Verification](../jws-verification.md) for endpoint URLs.
 
-## Custom base URLs
+### Custom base URLs
 
 Override `base_url`, `authorize_url`, and `token_url` for testing against mocks or staging environments:
 
@@ -48,9 +50,40 @@ config = BYOVAConfig(
 )
 ```
 
-## Accessing config
+### Accessing config
 
 ```python
 print(sdk.config.region)
 print(sdk.config.jwk_url)  # property — resolves US or EU URL
 ```
+
+## Media server
+
+The gRPC media server uses a separate `MediaServerConfig` (requires `pip install webex-byova[media]`):
+
+```python
+from webex_byova.media import BYOVAMediaServer, MediaServerConfig
+
+config = MediaServerConfig(
+    host="0.0.0.0",
+    port=50051,
+    audio_mode="chunked",
+    sample_rate=8000,
+    verify_tokens=True,
+)
+server = BYOVAMediaServer(config)
+```
+
+Load from environment:
+
+```python
+server = BYOVAMediaServer.from_env()
+```
+
+| Concern | BYOVA REST | Media server |
+|---------|------------|--------------|
+| Config class | `BYOVAConfig` | `MediaServerConfig` |
+| Env loader | `BYOVA.from_env()` | `BYOVAMediaServer.from_env()` |
+| Install extra | core package | `[media]` |
+
+See [Media Server Configuration](../media-server/configuration.md) for all fields and `WEBEX_MEDIA_*` environment variables.

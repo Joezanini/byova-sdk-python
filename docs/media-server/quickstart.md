@@ -27,7 +27,9 @@ async def main():
 asyncio.run(main())
 ```
 
-See also: `examples/media_server_minimal.py`
+See also: [`examples/media_server_minimal.py`](https://github.com/Joezanini/byova-sdk-python/blob/main/examples/media_server_minimal.py)
+
+More examples (multi-turn, DTMF, WebSocket proxy, BYODS combined): [Examples guide](../guides/examples.md#media-server-voice).
 
 ## 3. Register with Webex
 
