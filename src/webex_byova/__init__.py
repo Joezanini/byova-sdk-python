@@ -11,6 +11,12 @@ from webex_byova.exceptions import (
     WebexBYOVAError,
 )
 
+try:
+    from webex_byova.media import BYOVAMediaServer, MediaServerConfig
+except ImportError:  # pragma: no cover - media extra not installed
+    BYOVAMediaServer = None  # type: ignore[misc, assignment]
+    MediaServerConfig = None  # type: ignore[misc, assignment]
+
 __all__ = [
     "BYOVA",
     "BYOVAConfig",
@@ -20,4 +26,6 @@ __all__ = [
     "ValidationError",
     "RateLimitError",
     "__version__",
+    "BYOVAMediaServer",
+    "MediaServerConfig",
 ]

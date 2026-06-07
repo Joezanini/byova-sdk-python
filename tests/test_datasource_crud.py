@@ -12,9 +12,7 @@ from webex_byova.models.datasource import DataSourceCreate
 @pytest.mark.asyncio
 async def test_datasource_crud(sdk) -> None:
     org_id = "org-test-1"
-    await sdk._storage.set_integration_tokens(
-        OAuthTokens(access_token="int", expires_in=3600)
-    )
+    await sdk._storage.set_integration_tokens(OAuthTokens(access_token="int", expires_in=3600))
     await sdk._storage.set_service_app_tokens(
         org_id,
         ServiceAppTokens(access_token="sa-token", expires_in=3600, refresh_token="sr"),
@@ -61,9 +59,7 @@ async def test_datasource_crud(sdk) -> None:
             json={"id": "ds-1", "status": "disabled", "errorMessage": "maintenance"},
         )
     )
-    respx.delete("https://webexapis.com/v1/dataSources/ds-1").mock(
-        return_value=httpx.Response(204)
-    )
+    respx.delete("https://webexapis.com/v1/dataSources/ds-1").mock(return_value=httpx.Response(204))
 
     client = await sdk.aget_client_for_org(org_id)
     items = await client.data_sources.alist()

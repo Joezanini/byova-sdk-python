@@ -32,6 +32,14 @@ nav:
       - Environment Variables: guides/environment-variables.md
       - Error Handling: guides/error-handling.md
       - Examples: guides/examples.md
+  - Media Server:
+      - Overview: media-server/index.md
+      - Quickstart: media-server/quickstart.md
+      - Handlers: media-server/handlers.md
+      - Configuration: media-server/configuration.md
+      - WebSocket Proxy: media-server/proxy.md
+      - Protocol Notes: media-server/protocol-notes.md
+      - Deployment: media-server/deployment.md
   - API Reference:
       - webex_byova: api/webex_byova.md
       - webex_byova.auth: api/auth.md

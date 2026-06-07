@@ -29,8 +29,31 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e ".[dev,docs]"
+          pip install -e ".[dev,docs,media]"
           pip install build
+
+      - name: Generate media gRPC stubs
+        run: |
+          python -m grpc_tools.protoc \
+            -I src/webex_byova/media/_internal/proto \
+            --python_out=src/webex_byova/media/_internal/generated \
+            --grpc_python_out=src/webex_byova/media/_internal/generated \
+            --pyi_out=src/webex_byova/media/_internal/generated \
+            src/webex_byova/media/_internal/proto/byova_common.proto \
+            src/webex_byova/media/_internal/proto/voicevirtualagent.proto
+          python - <<'PY'
+          from pathlib import Path
+          out = Path("src/webex_byova/media/_internal/generated")
+          for f in out.glob("*_grpc.py"):
+              t = f.read_text()
+              t = t.replace("import voicevirtualagent_pb2", "from webex_byova.media._internal.generated import voicevirtualagent_pb2")
+              t = t.replace("import byova_common_pb2", "from webex_byova.media._internal.generated import byova_common_pb2")
+              f.write_text(t)
+          f = out / "voicevirtualagent_pb2.py"
+          t = f.read_text().replace("import byova_common_pb2", "from webex_byova.media._internal.generated import byova_common_pb2")
+          f.write_text(t)
+          (out / "__init__.py").write_text('"""Generated gRPC stubs."""\n')
+          PY
 
       - name: Ruff
         run: ruff check src tests

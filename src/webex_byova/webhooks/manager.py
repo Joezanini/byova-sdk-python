@@ -61,9 +61,7 @@ class WebhookManager:
             Webhook registration details.
         """
         token = await self._integration.aget_access_token()
-        data = await self._http.ajson_request(
-            "GET", f"/webhooks/{webhook_id}", bearer=token
-        )
+        data = await self._http.ajson_request("GET", f"/webhooks/{webhook_id}", bearer=token)
         return WebhookRegistration.model_validate(data)
 
     async def alist_service_app_webhooks(
@@ -83,9 +81,7 @@ class WebhookManager:
         """
         webhooks = await self.alist()
         results = [
-            w
-            for w in webhooks
-            if w.resource == "serviceApp" and w.event in _SERVICE_APP_EVENTS
+            w for w in webhooks if w.resource == "serviceApp" and w.event in _SERVICE_APP_EVENTS
         ]
         if target_url is not None:
             results = [w for w in results if w.target_url == target_url]
@@ -140,11 +136,7 @@ class WebhookManager:
         Returns:
             Updated webhook registration.
         """
-        body = (
-            payload.model_dump_api()
-            if isinstance(payload, WebhookUpdate)
-            else payload
-        )
+        body = payload.model_dump_api() if isinstance(payload, WebhookUpdate) else payload
         token = await self._integration.aget_access_token()
         data = await self._http.ajson_request(
             "PUT",
@@ -178,9 +170,7 @@ class WebhookManager:
         created: list[WebhookRegistration] = []
         for event in ("authorized", "deauthorized"):
             found = any(
-                w.resource == "serviceApp"
-                and w.event == event
-                and w.target_url == target_url
+                w.resource == "serviceApp" and w.event == event and w.target_url == target_url
                 for w in existing
             )
             if not found:

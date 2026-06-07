@@ -87,9 +87,7 @@ class DataSourceResource:
             Created data source resource.
         """
         body = (
-            payload.model_dump(by_alias=True)
-            if isinstance(payload, DataSourceCreate)
-            else payload
+            payload.model_dump(by_alias=True) if isinstance(payload, DataSourceCreate) else payload
         )
         data = await self._with_retry("POST", "/dataSources", json=body)
         return DataSource.model_validate(data)
@@ -106,11 +104,7 @@ class DataSourceResource:
         Returns:
             Updated data source resource.
         """
-        body = (
-            payload.model_dump_api()
-            if isinstance(payload, DataSourceUpdate)
-            else payload
-        )
+        body = payload.model_dump_api() if isinstance(payload, DataSourceUpdate) else payload
         data = await self._with_retry("PUT", f"/dataSources/{data_source_id}", json=body)
         return DataSource.model_validate(data)
 

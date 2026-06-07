@@ -29,9 +29,7 @@ def load_credentials_from_env() -> tuple[IntegrationCredentials, ServiceAppCrede
     int_secret = os.environ.get("WEBEX_INTEGRATION_CLIENT_SECRET")
     sa_id = os.environ.get("WEBEX_SA_CLIENT_ID")
     sa_secret = os.environ.get("WEBEX_SA_CLIENT_SECRET")
-    redirect = os.environ.get(
-        "WEBEX_INTEGRATION_REDIRECT_URI", "http://127.0.0.1:8765/callback"
-    )
+    redirect = os.environ.get("WEBEX_INTEGRATION_REDIRECT_URI", "http://127.0.0.1:8765/callback")
 
     missing = [
         name
