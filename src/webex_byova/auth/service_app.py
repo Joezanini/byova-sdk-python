@@ -11,7 +11,11 @@ from webex_byova.models.auth import ServiceAppCredentials, ServiceAppTokens
 
 
 class ServiceAppTokenManager:
-    """Fetch and store per-org Service App tokens."""
+    """Fetch, refresh, and store per-organization Service App tokens.
+
+    Service App tokens are scoped to a customer organization and are obtained
+    after a customer admin authorizes your Service App in Control Hub.
+    """
 
     def __init__(
         self,
@@ -20,6 +24,14 @@ class ServiceAppTokenManager:
         http: HttpClient,
         storage: TokenStorage,
     ) -> None:
+        """Initialize the Service App token manager.
+
+        Args:
+            credentials: Service App OAuth client credentials.
+            integration: Integration token manager for bearer authentication.
+            http: Shared HTTP client for API requests.
+            storage: Token storage backend.
+        """
         self._credentials = credentials
         self._integration = integration
         self._http = http
@@ -28,10 +40,12 @@ class ServiceAppTokenManager:
 
     @property
     def application_id(self) -> str:
+        """Base64url-encoded Service App application ID derived from client ID."""
         return self._application_id
 
     @property
     def credentials(self) -> ServiceAppCredentials:
+        """Service App OAuth client credentials."""
         return self._credentials
 
     def _parse_token_response(self, data: dict) -> ServiceAppTokens:
@@ -44,7 +58,17 @@ class ServiceAppTokenManager:
         )
 
     async def afetch_token_for_org(self, org_id: str) -> ServiceAppTokens:
-        """Fetch Service App token for org using Integration bearer."""
+        """Fetch Service App tokens for an organization using Integration bearer auth.
+
+        Args:
+            org_id: Target organization UUID.
+
+        Returns:
+            Service App tokens, persisted to storage.
+
+        Raises:
+            AuthenticationError: If the token fetch fails.
+        """
         integration_token = await self._integration.aget_access_token()
         path = f"/applications/{self._application_id}/token"
         data = await self._http.ajson_request(
@@ -62,6 +86,14 @@ class ServiceAppTokenManager:
         return tokens
 
     def fetch_token_for_org(self, org_id: str) -> ServiceAppTokens:
+        """Fetch Service App tokens for an organization (sync wrapper).
+
+        Args:
+            org_id: Target organization UUID.
+
+        Returns:
+            Service App tokens, persisted to storage.
+        """
         import asyncio
 
         return asyncio.run(self.afetch_token_for_org(org_id))
@@ -69,19 +101,48 @@ class ServiceAppTokenManager:
     async def afetch_token_from_webhook_org(
         self, encoded_org_id: str
     ) -> tuple[str, ServiceAppTokens]:
-        """Decode org ID from webhook and fetch tokens."""
+        """Decode org ID from a webhook payload and fetch Service App tokens.
+
+        Args:
+            encoded_org_id: Base64url-encoded org ID from the webhook ``orgId``.
+
+        Returns:
+            Tuple of ``(decoded_org_id, tokens)``.
+        """
         org_id = decode_org_id(encoded_org_id)
         tokens = await self.afetch_token_for_org(org_id)
         return org_id, tokens
 
     def save_registration(self, org_id: str, refresh_token: str) -> ServiceAppTokens:
-        """Store tokens when developer already has a refresh token (sandbox path)."""
+        """Store tokens when a refresh token is already available (sync).
+
+        Use this sandbox path when you already have a Service App refresh token
+        without waiting for a production webhook.
+
+        Args:
+            org_id: Organization UUID.
+            refresh_token: Existing Service App refresh token.
+
+        Returns:
+            Refreshed Service App tokens.
+        """
         import asyncio
 
         return asyncio.run(self.asave_registration(org_id, refresh_token))
 
     async def asave_registration(self, org_id: str, refresh_token: str) -> ServiceAppTokens:
-        """Store tokens when developer already has a refresh token (sandbox path)."""
+        """Store tokens when a refresh token is already available.
+
+        Use this sandbox path when you already have a Service App refresh token
+        without waiting for a production webhook.
+
+        Args:
+            org_id: Organization UUID.
+            refresh_token: Existing Service App refresh token.
+
+        Returns:
+            Refreshed Service App tokens.
+        """
         tokens = ServiceAppTokens(
             access_token="",
             expires_in=0,
@@ -91,7 +152,17 @@ class ServiceAppTokenManager:
         return await self.arefresh_for_org(org_id)
 
     async def arefresh_for_org(self, org_id: str) -> ServiceAppTokens:
-        """Refresh Service App access token for org."""
+        """Refresh the Service App access token for an organization.
+
+        If no refresh token is stored, falls back to fetching new tokens
+        via the Integration bearer.
+
+        Args:
+            org_id: Organization UUID.
+
+        Returns:
+            Refreshed Service App tokens, persisted to storage.
+        """
         stored = await self._storage.get_service_app_tokens(org_id)
         if stored is None or not stored.refresh_token:
             return await self.afetch_token_for_org(org_id)
@@ -116,6 +187,19 @@ class ServiceAppTokenManager:
         return tokens
 
     async def aget_access_token(self, org_id: str) -> str:
+        """Return a valid Service App access token for an organization.
+
+        Refreshes automatically if the token is missing or expired.
+
+        Args:
+            org_id: Organization UUID.
+
+        Returns:
+            Valid bearer access token for org-scoped API calls.
+
+        Raises:
+            AuthenticationError: If the org is not registered.
+        """
         tokens = await self._storage.get_service_app_tokens(org_id)
         if tokens is None:
             raise AuthenticationError(

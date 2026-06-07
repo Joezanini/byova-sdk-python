@@ -1,19 +1,64 @@
 site_name: webex-byova
 site_description: Python SDK for Webex BYOVA / BYODS
+site_url: https://joezanini.github.io/byova-sdk-python/
+repo_url: https://github.com/Joezanini/byova-sdk-python
+edit_uri: edit/main/docs/
+docs_dir: .
+site_dir: ../site
+
 theme:
   name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - content.code.copy
+    - search.highlight
+
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
-  - Credentials: credentials.md
-  - Integration OAuth: integration-oauth.md
-  - Automated Token Flow: automated-token-flow.md
-  - Authentication: authentication.md
-  - Data Sources: data-sources.md
-  - JWS Verification: jws-verification.md
+  - Concepts:
+      - Architecture: concepts/architecture.md
+      - Credentials: credentials.md
+      - Authentication: authentication.md
+  - Guides:
+      - Integration OAuth: integration-oauth.md
+      - Automated Token Flow: automated-token-flow.md
+      - Webhooks: guides/webhooks.md
+      - Data Sources: data-sources.md
+      - Schemas: guides/schemas.md
+      - JWS Verification: jws-verification.md
+      - Configuration: guides/configuration.md
+      - Environment Variables: guides/environment-variables.md
+      - Error Handling: guides/error-handling.md
+      - Examples: guides/examples.md
+  - API Reference:
+      - webex_byova: api/webex_byova.md
+      - webex_byova.auth: api/auth.md
+      - webex_byova.models: api/models.md
+      - webex_byova.resources: api/resources.md
+      - webex_byova.webhooks: api/webhooks.md
+      - webex_byova.jws: api/jws.md
+      - Exceptions: api/exceptions.md
+
 plugins:
   - search
   - mkdocstrings:
       handlers:
         python:
           paths: [../src]
+          options:
+            docstring_style: google
+            show_root_heading: true
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+            show_source: false
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format

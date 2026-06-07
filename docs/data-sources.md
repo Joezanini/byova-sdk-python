@@ -25,12 +25,7 @@ await client.data_sources.aupdate(ds.id, {"status": "disabled", "errorMessage": 
 await client.data_sources.adelete(ds.id)
 ```
 
-## Schemas
-
-```python
-schemas = await client.schemas.alist()
-schema = await client.schemas.aget(schema_id)
-```
+Schema discovery is covered in [Schemas](guides/schemas.md).
 
 ## Token extension
 

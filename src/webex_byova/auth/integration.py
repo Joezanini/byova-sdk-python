@@ -18,10 +18,15 @@ DEFAULT_INTEGRATION_SCOPES: list[str] = [
     "application:webhooks_write",
     "application:webhooks_read",
 ]
+"""Default OAuth scopes required for BYOVA Integration authorization."""
 
 
 class IntegrationTokenManager:
-    """Manage Integration OAuth tokens (developer-initiated flow)."""
+    """Manage Integration OAuth tokens for the developer-initiated flow.
+
+    Handles authorization URL generation, code exchange, token refresh, and
+    the full browser-based OAuth flow with a local redirect listener.
+    """
 
     def __init__(
         self,
@@ -30,6 +35,14 @@ class IntegrationTokenManager:
         storage: TokenStorage,
         config: BYOVAConfig | None = None,
     ) -> None:
+        """Initialize the Integration token manager.
+
+        Args:
+            credentials: Integration OAuth client credentials.
+            http: Shared HTTP client for API requests.
+            storage: Token storage backend.
+            config: Optional SDK configuration; defaults to ``http.config``.
+        """
         self._credentials = credentials
         self._http = http
         self._storage = storage
@@ -37,6 +50,7 @@ class IntegrationTokenManager:
 
     @property
     def credentials(self) -> IntegrationCredentials:
+        """Integration OAuth client credentials."""
         return self._credentials
 
     def get_authorization_url(
@@ -45,7 +59,15 @@ class IntegrationTokenManager:
         *,
         state: str | None = None,
     ) -> tuple[str, str]:
-        """Build authorization URL. Returns (url, state)."""
+        """Build the OAuth authorization URL.
+
+        Args:
+            scopes: OAuth scopes to request; defaults to ``DEFAULT_INTEGRATION_SCOPES``.
+            state: CSRF state token; generated automatically if not provided.
+
+        Returns:
+            Tuple of ``(authorization_url, state)``.
+        """
         resolved_scopes = scopes if scopes is not None else DEFAULT_INTEGRATION_SCOPES
         csrf = state or secrets.token_urlsafe(16)
         params = {
@@ -68,7 +90,17 @@ class IntegrationTokenManager:
         )
 
     def exchange_code(self, code: str) -> OAuthTokens:
-        """Exchange authorization code for tokens."""
+        """Exchange an authorization code for OAuth tokens (sync).
+
+        Args:
+            code: Authorization code from the OAuth redirect.
+
+        Returns:
+            OAuth tokens from the Webex token endpoint.
+
+        Raises:
+            AuthenticationError: If the token exchange fails.
+        """
         data = self._http.json_request(
             "POST",
             self._config.token_url,
@@ -85,6 +117,17 @@ class IntegrationTokenManager:
         return tokens
 
     async def aexchange_code(self, code: str) -> OAuthTokens:
+        """Exchange an authorization code for OAuth tokens (async).
+
+        Args:
+            code: Authorization code from the OAuth redirect.
+
+        Returns:
+            OAuth tokens from the Webex token endpoint.
+
+        Raises:
+            AuthenticationError: If the token exchange fails.
+        """
         data = await self._http.ajson_request(
             "POST",
             self._config.token_url,
@@ -100,12 +143,33 @@ class IntegrationTokenManager:
         return self._parse_token_response(data)
 
     def refresh(self, refresh_token: str | None = None) -> OAuthTokens:
-        """Refresh Integration access token."""
+        """Refresh the Integration access token (sync wrapper).
+
+        Args:
+            refresh_token: Explicit refresh token; uses stored token if omitted.
+
+        Returns:
+            Refreshed OAuth tokens.
+
+        Raises:
+            AuthenticationError: If no refresh token is available.
+        """
         import asyncio
 
         return asyncio.run(self.arefresh(refresh_token))
 
     async def arefresh(self, refresh_token: str | None = None) -> OAuthTokens:
+        """Refresh the Integration access token.
+
+        Args:
+            refresh_token: Explicit refresh token; uses stored token if omitted.
+
+        Returns:
+            Refreshed OAuth tokens, persisted to storage.
+
+        Raises:
+            AuthenticationError: If no refresh token is available.
+        """
         rt = refresh_token
         if rt is None:
             stored = await self._storage.get_integration_tokens()
@@ -140,7 +204,25 @@ class IntegrationTokenManager:
         timeout: float = 300.0,
         state: str | None = None,
     ) -> OAuthTokens:
-        """Run full OAuth flow with local redirect listener."""
+        """Run the full OAuth flow with a local redirect listener (sync).
+
+        Opens the authorization URL in a browser, waits for the redirect,
+        exchanges the code, and stores tokens.
+
+        Args:
+            scopes: OAuth scopes to request.
+            open_browser: Whether to open the authorization URL automatically.
+            timeout: Maximum seconds to wait for the OAuth redirect.
+            state: CSRF state token; generated if not provided.
+
+        Returns:
+            OAuth tokens from the completed authorization.
+
+        Raises:
+            OAuthRedirectError: If the user denies access.
+            OAuthRedirectTimeout: If the redirect listener times out.
+            AuthenticationError: If token exchange fails.
+        """
         url, csrf = self.get_authorization_url(scopes, state=state)
         code, _ = wait_for_redirect(
             self._credentials.redirect_uri,
@@ -163,6 +245,25 @@ class IntegrationTokenManager:
         timeout: float = 300.0,
         state: str | None = None,
     ) -> OAuthTokens:
+        """Run the full OAuth flow with a local redirect listener (async).
+
+        Opens the authorization URL in a browser, waits for the redirect,
+        exchanges the code, and stores tokens.
+
+        Args:
+            scopes: OAuth scopes to request.
+            open_browser: Whether to open the authorization URL automatically.
+            timeout: Maximum seconds to wait for the OAuth redirect.
+            state: CSRF state token; generated if not provided.
+
+        Returns:
+            OAuth tokens from the completed authorization.
+
+        Raises:
+            OAuthRedirectError: If the user denies access.
+            OAuthRedirectTimeout: If the redirect listener times out.
+            AuthenticationError: If token exchange fails.
+        """
         url, csrf = self.get_authorization_url(scopes, state=state)
         code, _ = wait_for_redirect(
             self._credentials.redirect_uri,
@@ -176,12 +277,27 @@ class IntegrationTokenManager:
         return tokens
 
     def get_access_token(self) -> str:
-        """Return valid Integration access token, refreshing if needed."""
+        """Return a valid Integration access token, refreshing if needed (sync).
+
+        Returns:
+            Valid bearer access token.
+
+        Raises:
+            AuthenticationError: If Integration is not yet authorized.
+        """
         import asyncio
 
         return asyncio.run(self.aget_access_token())
 
     async def aget_access_token(self) -> str:
+        """Return a valid Integration access token, refreshing if needed.
+
+        Returns:
+            Valid bearer access token.
+
+        Raises:
+            AuthenticationError: If Integration is not yet authorized.
+        """
         tokens = await self._storage.get_integration_tokens()
         if tokens is None:
             raise AuthenticationError(

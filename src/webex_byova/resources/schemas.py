@@ -8,7 +8,7 @@ from webex_byova.models.schema import Schema, SchemaListResponse
 
 
 class SchemaResource:
-    """List and get data source schemas."""
+    """List and retrieve BYODS data source schemas for an organization."""
 
     def __init__(
         self,
@@ -16,16 +16,36 @@ class SchemaResource:
         http: HttpClient,
         org_id: str,
     ) -> None:
+        """Initialize the schema resource.
+
+        Args:
+            service_app: Service App token manager.
+            http: Shared HTTP client.
+            org_id: Organization UUID for token scoping.
+        """
         self._service_app = service_app
         self._http = http
         self._org_id = org_id
 
     async def alist(self) -> list[Schema]:
+        """List available BYODS schemas for the organization.
+
+        Returns:
+            List of schema definitions.
+        """
         bearer = await self._service_app.aget_access_token(self._org_id)
         data = await self._http.ajson_request("GET", "/dataSources/schemas", bearer=bearer)
         return SchemaListResponse.model_validate(data).items
 
     async def aget(self, schema_id: str) -> Schema:
+        """Get a schema by ID.
+
+        Args:
+            schema_id: Unique schema UUID.
+
+        Returns:
+            Schema definition.
+        """
         bearer = await self._service_app.aget_access_token(self._org_id)
         data = await self._http.ajson_request(
             "GET", f"/dataSources/schemas/{schema_id}", bearer=bearer

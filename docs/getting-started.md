@@ -19,6 +19,12 @@
 pip install webex-byova
 ```
 
+For development with docs and tests:
+
+```bash
+pip install -e ".[dev,docs]"
+```
+
 ## Authorize Integration and register webhooks
 
 ```python
@@ -32,13 +38,16 @@ sdk = BYOVA(
 )
 
 async def setup():
-    await sdk.integration.aauthorize()
+    tokens = await sdk.integration.aauthorize()
+    print("Authorized; access token expires at", tokens.expires_at)
     await sdk.webhooks.aensure_service_app_webhooks(
         "https://your-server.example.com/webhooks/webex"
     )
 
 asyncio.run(setup())
 ```
+
+Or load credentials from environment variables — see [Environment Variables](guides/environment-variables.md).
 
 ## Register a data source
 
@@ -55,3 +64,12 @@ await client.data_sources.acreate({
     "tokenLifetimeMinutes": 60,
 })
 ```
+
+Discover schemas first — see [Schemas](guides/schemas.md).
+
+## Next steps
+
+- [Architecture](concepts/architecture.md) — two-tier credentials and async conventions
+- [Automated Token Flow](automated-token-flow.md) — end-to-end multi-tenant sequence
+- [Webhooks](guides/webhooks.md) — handle authorized/deauthorized events
+- [Examples](guides/examples.md) — runnable scripts in `examples/`

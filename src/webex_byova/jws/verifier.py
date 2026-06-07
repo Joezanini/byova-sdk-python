@@ -11,9 +11,14 @@ from webex_byova.config import BYOVAConfig
 
 
 class JWSVerifier:
-    """Fetch JWKs and verify JWS tokens."""
+    """Fetch Webex JWKs and verify inbound BYODS JWS tokens."""
 
     def __init__(self, config: BYOVAConfig | None = None) -> None:
+        """Initialize the JWS verifier.
+
+        Args:
+            config: SDK configuration for JWK URL and timeout; uses defaults if omitted.
+        """
         self._config = config or BYOVAConfig()
         self._jwks_cache: dict[str, Any] | None = None
 
@@ -26,7 +31,20 @@ class JWSVerifier:
         return self._jwks_cache
 
     def verify(self, jws_token: str) -> dict[str, Any]:
-        """Verify JWS and return decoded claims."""
+        """Verify a JWS token and return decoded claims.
+
+        Fetches JWKs from the configured region endpoint and validates
+        the RS256 signature.
+
+        Args:
+            jws_token: JWS token string from Webex data delivery.
+
+        Returns:
+            Decoded JWT claims dictionary.
+
+        Raises:
+            ValueError: If the token is malformed or no matching JWK is found.
+        """
         jwks = self._fetch_jwks()
         try:
             header = jwt.get_unverified_header(jws_token)
@@ -52,4 +70,17 @@ class JWSVerifier:
         )
 
     async def averify(self, jws_token: str) -> dict[str, Any]:
+        """Verify a JWS token asynchronously.
+
+        Currently delegates to the sync implementation (JWK fetch is sync).
+
+        Args:
+            jws_token: JWS token string from Webex data delivery.
+
+        Returns:
+            Decoded JWT claims dictionary.
+
+        Raises:
+            ValueError: If the token is malformed or no matching JWK is found.
+        """
         return self.verify(jws_token)

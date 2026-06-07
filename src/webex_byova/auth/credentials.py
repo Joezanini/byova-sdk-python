@@ -8,7 +8,23 @@ from webex_byova.models.auth import IntegrationCredentials, ServiceAppCredential
 
 
 def load_credentials_from_env() -> tuple[IntegrationCredentials, ServiceAppCredentials]:
-    """Load Integration and Service App credentials from environment variables."""
+    """Load Integration and Service App credentials from environment variables.
+
+    Required variables:
+        - ``WEBEX_INTEGRATION_CLIENT_ID``
+        - ``WEBEX_INTEGRATION_CLIENT_SECRET``
+        - ``WEBEX_SA_CLIENT_ID``
+        - ``WEBEX_SA_CLIENT_SECRET``
+
+    Optional variables:
+        - ``WEBEX_INTEGRATION_REDIRECT_URI`` (defaults to ``http://127.0.0.1:8765/callback``)
+
+    Returns:
+        Tuple of ``IntegrationCredentials`` and ``ServiceAppCredentials``.
+
+    Raises:
+        ValueError: If any required environment variable is missing.
+    """
     int_id = os.environ.get("WEBEX_INTEGRATION_CLIENT_ID")
     int_secret = os.environ.get("WEBEX_INTEGRATION_CLIENT_SECRET")
     sa_id = os.environ.get("WEBEX_SA_CLIENT_ID")

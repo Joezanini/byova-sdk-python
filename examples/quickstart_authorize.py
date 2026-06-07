@@ -10,12 +10,12 @@ async def main() -> None:
     sdk = BYOVA.from_env()
 
     print("Opening browser for Integration OAuth (developer authorization)...")
-    await sdk.integration.aauthorize(open_browser=True)
+    tokens = await sdk.integration.aauthorize(open_browser=True)
     print("Integration authorized.")
-    print("Access token:", sdk.integration.access_token)
-    print("Refresh token:", sdk.integration.refresh_token)
-    print("Expires at:", sdk.integration.expires_at)
-    print("Scopes:", sdk.integration.scopes)
+    print("Access token:", tokens.access_token[:20] + "...")
+    if tokens.refresh_token:
+        print("Refresh token:", tokens.refresh_token[:20] + "...")
+    print("Expires at:", tokens.expires_at)
     
 
     target = os.environ.get("WEBEX_WEBHOOK_TARGET_URL")

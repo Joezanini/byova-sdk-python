@@ -20,6 +20,18 @@ ruff check src tests
 ruff format src tests
 ```
 
+## Documentation
+
+Install docs dependencies and preview the site:
+
+```bash
+pip install -e ".[docs]"
+mkdocs serve -f docs/mkdocs.yml   # http://127.0.0.1:8000
+mkdocs build -f docs/mkdocs.yml --strict
+```
+
+User-facing changes should update pages under `docs/` and public API docstrings in `src/webex_byova/`.
+
 ## Pull request process
 
 1. Fork the repository and create a feature branch.

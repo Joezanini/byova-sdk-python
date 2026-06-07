@@ -12,9 +12,15 @@ _SERVICE_APP_EVENTS = frozenset({"authorized", "deauthorized"})
 
 
 class WebhookManager:
-    """Register and manage serviceApp webhooks."""
+    """Register and manage ``serviceApp`` webhooks via Integration bearer auth."""
 
     def __init__(self, integration: IntegrationTokenManager, http: HttpClient) -> None:
+        """Initialize the webhook manager.
+
+        Args:
+            integration: Integration token manager for bearer authentication.
+            http: Shared HTTP client.
+        """
         self._integration = integration
         self._http = http
 
@@ -24,6 +30,15 @@ class WebhookManager:
         max: int | None = None,
         owned_by: str | None = None,
     ) -> list[WebhookRegistration]:
+        """List all registered webhooks.
+
+        Args:
+            max: Maximum number of webhooks to return.
+            owned_by: Filter by webhook owner.
+
+        Returns:
+            List of webhook registrations.
+        """
         token = await self._integration.aget_access_token()
         params: dict[str, Any] = {}
         if max is not None:
@@ -37,6 +52,14 @@ class WebhookManager:
         return [WebhookRegistration.model_validate(w) for w in items]
 
     async def aget(self, webhook_id: str) -> WebhookRegistration:
+        """Get a webhook by ID.
+
+        Args:
+            webhook_id: Unique webhook identifier.
+
+        Returns:
+            Webhook registration details.
+        """
         token = await self._integration.aget_access_token()
         data = await self._http.ajson_request(
             "GET", f"/webhooks/{webhook_id}", bearer=token
@@ -49,7 +72,15 @@ class WebhookManager:
         target_url: str | None = None,
         event: str | None = None,
     ) -> list[WebhookRegistration]:
-        """List serviceApp authorized/deauthorized webhooks."""
+        """List ``serviceApp`` authorized/deauthorized webhooks.
+
+        Args:
+            target_url: Filter by target URL.
+            event: Filter by event name (``authorized`` or ``deauthorized``).
+
+        Returns:
+            Matching serviceApp webhook registrations.
+        """
         webhooks = await self.alist()
         results = [
             w
@@ -70,6 +101,17 @@ class WebhookManager:
         resource: str = "serviceApp",
         event: str,
     ) -> WebhookRegistration:
+        """Create a new webhook.
+
+        Args:
+            name: Human-readable webhook name.
+            target_url: HTTPS URL that receives webhook payloads.
+            resource: Webhook resource type (default ``serviceApp``).
+            event: Event name (for example ``authorized``).
+
+        Returns:
+            Created webhook registration.
+        """
         token = await self._integration.aget_access_token()
         data = await self._http.ajson_request(
             "POST",
@@ -89,6 +131,15 @@ class WebhookManager:
         webhook_id: str,
         payload: WebhookUpdate | dict[str, Any],
     ) -> WebhookRegistration:
+        """Update an existing webhook.
+
+        Args:
+            webhook_id: Unique webhook identifier.
+            payload: Update payload as a model or dict.
+
+        Returns:
+            Updated webhook registration.
+        """
         body = (
             payload.model_dump_api()
             if isinstance(payload, WebhookUpdate)
@@ -104,11 +155,25 @@ class WebhookManager:
         return WebhookRegistration.model_validate(data)
 
     async def adelete(self, webhook_id: str) -> None:
+        """Delete a webhook.
+
+        Args:
+            webhook_id: Unique webhook identifier.
+        """
         token = await self._integration.aget_access_token()
         await self._http.arequest("DELETE", f"/webhooks/{webhook_id}", bearer=token)
 
     async def aensure_service_app_webhooks(self, target_url: str) -> list[WebhookRegistration]:
-        """Create authorized/deauthorized webhooks if not already registered."""
+        """Create authorized and deauthorized webhooks if not already registered.
+
+        Idempotent: skips events that already have a webhook for ``target_url``.
+
+        Args:
+            target_url: HTTPS URL for webhook delivery.
+
+        Returns:
+            List of newly created webhook registrations (empty if all exist).
+        """
         existing = await self.alist()
         created: list[WebhookRegistration] = []
         for event in ("authorized", "deauthorized"):

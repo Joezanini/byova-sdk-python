@@ -23,10 +23,17 @@ from webex_byova.webhooks.manager import WebhookManager
 
 
 class BYOVA:
-    """
-    Webex BYOVA / BYODS Python SDK.
+    """Webex BYOVA / BYODS Python SDK facade.
 
-    Manages Integration OAuth, Service App tokens per org, DataSource CRUD, and JWS verification.
+    Central entry point that wires Integration OAuth, Service App token
+    management, webhook registration, per-org API clients, and JWS verification.
+
+    Example:
+        ```python
+        sdk = BYOVA(integration=..., service_app=...)
+        await sdk.integration.aauthorize()
+        client = await sdk.aget_client_for_org(org_id)
+        ```
     """
 
     def __init__(
@@ -37,6 +44,14 @@ class BYOVA:
         config: BYOVAConfig | None = None,
         token_storage: TokenStorage | None = None,
     ) -> None:
+        """Initialize the BYOVA SDK client.
+
+        Args:
+            integration: Integration OAuth credentials.
+            service_app: Service App OAuth credentials.
+            config: Optional global SDK configuration.
+            token_storage: Token persistence backend; defaults to in-memory storage.
+        """
         self._config = config or BYOVAConfig()
         self._storage: TokenStorage = token_storage or InMemoryTokenStorage()
         self._http = HttpClient(self._config)
@@ -51,28 +66,52 @@ class BYOVA:
 
     @classmethod
     def from_env(cls, *, config: BYOVAConfig | None = None) -> BYOVA:
-        """Construct client from WEBEX_* environment variables."""
+        """Construct a client from ``WEBEX_*`` environment variables.
+
+        Args:
+            config: Optional global SDK configuration.
+
+        Returns:
+            Configured ``BYOVA`` instance.
+
+        Raises:
+            ValueError: If required environment variables are missing.
+        """
         integration, service_app = load_credentials_from_env()
         return cls(integration, service_app, config=config)
 
     @property
     def config(self) -> BYOVAConfig:
+        """Global SDK configuration."""
         return self._config
 
     @property
     def integration(self) -> IntegrationTokenManager:
+        """Integration OAuth token manager."""
         return self._integration
 
     @property
     def service_app(self) -> ServiceAppTokenManager:
+        """Service App token manager for per-org tokens."""
         return self._service_app
 
     @property
     def webhooks(self) -> WebhookManager:
+        """Webhook registration and management."""
         return self._webhooks
 
     def get_client_for_org(self, org_id: str) -> OrgClient:
-        """Return per-org client for DataSource operations."""
+        """Return a per-org client for DataSource operations (sync).
+
+        Args:
+            org_id: Organization UUID.
+
+        Returns:
+            ``OrgClient`` scoped to the organization.
+
+        Raises:
+            OrgNotRegisteredError: If no Service App tokens exist for the org.
+        """
         import asyncio
 
         registered = asyncio.run(self._storage.list_registered_orgs())
@@ -84,6 +123,17 @@ class BYOVA:
         return OrgClient(org_id, self._service_app, self._http)
 
     async def aget_client_for_org(self, org_id: str) -> OrgClient:
+        """Return a per-org client for DataSource and Schema operations.
+
+        Args:
+            org_id: Organization UUID.
+
+        Returns:
+            ``OrgClient`` scoped to the organization.
+
+        Raises:
+            OrgNotRegisteredError: If no Service App tokens exist for the org.
+        """
         registered = await self._storage.list_registered_orgs()
         if org_id not in registered:
             raise OrgNotRegisteredError(
@@ -95,7 +145,20 @@ class BYOVA:
     async def ahandle_service_app_webhook(
         self, payload: dict[str, Any]
     ) -> ServiceAppAuthorizedResult | ServiceAppDeauthorizedResult:
-        """Process serviceApp authorized/deauthorized webhook."""
+        """Process a ``serviceApp`` authorized or deauthorized webhook.
+
+        On authorization, fetches and stores Service App tokens for the org.
+        On deauthorization, removes stored tokens.
+
+        Args:
+            payload: Raw webhook JSON from Webex.
+
+        Returns:
+            ``ServiceAppAuthorizedResult`` or ``ServiceAppDeauthorizedResult``.
+
+        Raises:
+            ValidationError: If the payload is not a valid serviceApp event.
+        """
         event = ServiceAppWebhookEvent.from_payload(payload)
         if event.resource and event.resource != "serviceApp":
             raise ValidationError(f"Unexpected webhook resource: {event.resource}")
@@ -125,18 +188,50 @@ class BYOVA:
     def handle_service_app_webhook(
         self, payload: dict[str, Any]
     ) -> ServiceAppAuthorizedResult | ServiceAppDeauthorizedResult:
+        """Process a serviceApp webhook (sync wrapper).
+
+        Args:
+            payload: Raw webhook JSON from Webex.
+
+        Returns:
+            Authorization or deauthorization result.
+        """
         import asyncio
 
         return asyncio.run(self.ahandle_service_app_webhook(payload))
 
     def verify_jws_token(self, jws_token: str) -> dict[str, Any]:
+        """Verify an inbound BYODS JWS token (sync).
+
+        Args:
+            jws_token: JWS token string from Webex data delivery.
+
+        Returns:
+            Decoded JWT claims dictionary.
+
+        Raises:
+            ValueError: If the token is invalid or no matching JWK is found.
+        """
         return self._jws.verify(jws_token)
 
     async def averify_jws_token(self, jws_token: str) -> dict[str, Any]:
+        """Verify an inbound BYODS JWS token.
+
+        Args:
+            jws_token: JWS token string from Webex data delivery.
+
+        Returns:
+            Decoded JWT claims dictionary.
+
+        Raises:
+            ValueError: If the token is invalid or no matching JWK is found.
+        """
         return await self._jws.averify(jws_token)
 
     def close(self) -> None:
+        """Close the underlying HTTP client and release connections."""
         self._http.close()
 
     async def aclose(self) -> None:
+        """Close the underlying HTTP client asynchronously."""
         await self._http.aclose()

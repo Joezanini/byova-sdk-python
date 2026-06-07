@@ -7,7 +7,17 @@ from dataclasses import dataclass
 
 @dataclass
 class BYOVAConfig:
-    """Global SDK configuration."""
+    """Global SDK configuration for Webex API endpoints and behavior.
+
+    Attributes:
+        base_url: Base URL for Webex REST API requests.
+        authorize_url: OAuth authorization endpoint.
+        token_url: OAuth token exchange and refresh endpoint.
+        jwk_url_us: JWK verification URL for US region.
+        jwk_url_eu: JWK verification URL for EU region.
+        region: Active region for JWK lookup (``us`` or ``eu``).
+        timeout: HTTP request timeout in seconds.
+    """
 
     base_url: str = "https://webexapis.com/v1"
     authorize_url: str = "https://webexapis.com/v1/authorize"
@@ -19,6 +29,11 @@ class BYOVAConfig:
 
     @property
     def jwk_url(self) -> str:
+        """Return the JWK URL for the configured region.
+
+        Returns:
+            JWK verification URL for ``us`` or ``eu`` based on ``region``.
+        """
         if self.region.lower() == "eu":
             return self.jwk_url_eu
         return self.jwk_url_us

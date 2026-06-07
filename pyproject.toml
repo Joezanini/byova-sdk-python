@@ -43,7 +43,7 @@ docs = [
 
 [project.urls]
 Homepage = "https://github.com/Joezanini/byova-sdk-python"
-Documentation = "https://github.com/Joezanini/byova-sdk-python#readme"
+Documentation = "https://joezanini.github.io/byova-sdk-python/"
 Repository = "https://github.com/Joezanini/byova-sdk-python"
 
 [tool.hatch.version]

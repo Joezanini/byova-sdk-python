@@ -15,5 +15,13 @@ venv/
 htmlcov/
 .coverage
 site/
+docs/site/
 src/webex_byova/_version.py
+
+# Cursor IDE (local rules, skills, and config)
+.cursor/
+.cursorrules
+
+# Spec Kit / Specify (local tooling, templates, and config)
+.specify/
 

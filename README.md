@@ -64,7 +64,16 @@ sdk = BYOVA.from_env()
 
 ## Documentation
 
-See the [docs/](docs/) directory and [CONTRIBUTING.md](CONTRIBUTING.md).
+Full documentation: **[joezanini.github.io/byova-sdk-python](https://joezanini.github.io/byova-sdk-python/)**
+
+Build and preview locally:
+
+```bash
+pip install -e ".[docs]"
+mkdocs serve -f docs/mkdocs.yml   # http://127.0.0.1:8000
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup.
 
 ## License
 
