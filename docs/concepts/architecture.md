@@ -30,7 +30,7 @@ See [Credentials](../credentials.md) for field details.
 
 ## BYOVA media server (optional)
 
-The `webex_byova.media` module is installed separately via `pip install webex-byova[media]`. It does not change existing BYODS REST APIs.
+The `webex_byova.media` module is installed separately via `pip install "webex-byova[media]"`. It does not change existing BYODS REST APIs.
 
 ```mermaid
 flowchart LR

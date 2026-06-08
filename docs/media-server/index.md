@@ -7,7 +7,7 @@ Use it when Webex Contact Center connects to **your** server for live voice sess
 ## Install
 
 ```bash
-pip install webex-byova[media]
+pip install "webex-byova[media]"
 ```
 
 The core package (`pip install webex-byova`) is unchanged; media dependencies (gRPC, WebSocket client) are gated behind the `[media]` extra.

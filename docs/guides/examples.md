@@ -58,7 +58,7 @@ POST webhook payloads to `http://localhost:8000/webhooks/webex`. See [Webhooks](
 These examples require the optional media extra:
 
 ```bash
-pip install webex-byova[media]
+pip install "webex-byova[media]"
 ```
 
 For local development, disable token verification with `MediaServerConfig(verify_tokens=False)` or `WEBEX_MEDIA_VERIFY_TOKENS=false`. See [Media Server Configuration](../media-server/configuration.md).

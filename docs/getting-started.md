@@ -35,7 +35,7 @@ pip install webex-byova
 For the gRPC media server (voice streaming):
 
 ```bash
-pip install webex-byova[media]
+pip install "webex-byova[media]"
 ```
 
 For development with docs and tests:

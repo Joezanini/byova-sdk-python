@@ -59,7 +59,7 @@ print(sdk.config.jwk_url)  # property — resolves US or EU URL
 
 ## Media server
 
-The gRPC media server uses a separate `MediaServerConfig` (requires `pip install webex-byova[media]`):
+The gRPC media server uses a separate `MediaServerConfig` (requires `pip install "webex-byova[media]"`):
 
 ```python
 from webex_byova.media import BYOVAMediaServer, MediaServerConfig

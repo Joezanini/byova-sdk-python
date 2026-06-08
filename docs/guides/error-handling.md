@@ -19,7 +19,7 @@ WebexBYOVAError
 
 ### Media server (`webex_byova.media`)
 
-Requires `pip install webex-byova[media]`.
+Requires `pip install "webex-byova[media]"`.
 
 ```
 WebexBYOVAError

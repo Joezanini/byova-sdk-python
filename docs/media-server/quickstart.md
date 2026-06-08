@@ -5,7 +5,7 @@ Run a minimal media server in under 15 minutes.
 ## 1. Install
 
 ```bash
-pip install webex-byova[media]
+pip install "webex-byova[media]"
 ```
 
 ## 2. Hello world

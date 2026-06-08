@@ -6,7 +6,7 @@ BYOVA gRPC media server — async handler API for voice virtual agent streaming.
     This module requires the media extra:
 
     ```bash
-    pip install webex-byova[media]
+    pip install "webex-byova[media]"
     ```
 
 ## Overview

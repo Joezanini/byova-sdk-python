@@ -14,7 +14,7 @@ Python SDK for Webex Contact Center **Bring Your Own Virtual Agent (BYOVA)** and
 
 ### BYOVA gRPC media server
 
-Install with the optional `[media]` extra (`pip install webex-byova[media]`):
+Install with the optional `[media]` extra (`pip install "webex-byova[media]"`):
 
 - **Handler-based media server** — `BYOVAMediaServer` with async event callbacks (no protobuf/gRPC code required)
 - **Turn-based sessions** — play prompts, collect voice or DTMF input, barge-in, multi-turn dialogs
@@ -33,7 +33,7 @@ pip install webex-byova
 Voice / gRPC media server:
 
 ```bash
-pip install webex-byova[media]
+pip install "webex-byova[media]"
 ```
 
 ## Quick links
