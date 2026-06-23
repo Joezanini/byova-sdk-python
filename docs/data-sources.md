@@ -1,5 +1,7 @@
 # Data Sources
 
+For where data source registration fits in the overall BYOVA workflow, see the [BYOVA Data Journey](concepts/data-journey.md#phase-3).
+
 ## CRUD operations
 
 ```python

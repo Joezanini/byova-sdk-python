@@ -2,6 +2,8 @@
 
 The SDK is built around a **two-tier credential model**, **async-first** API design, and an optional **gRPC media server** for live BYOVA voice sessions.
 
+For the operational workflow — how portal registration, org tokens, data sources, Flow Designer onboarding, and live sessions connect — see the [BYOVA Data Journey](data-journey.md).
+
 ## Two-tier credentials
 
 ```mermaid
@@ -30,7 +32,7 @@ See [Credentials](../credentials.md) for field details.
 
 ## BYOVA media server (optional)
 
-The `webex_byova.media` module is installed separately via `pip install webex-byova[media]`. It does not change existing BYODS REST APIs.
+The `webex_byova.media` module is installed separately via `pip install "webex-byova[media]"`. It does not change existing BYODS REST APIs.
 
 ```mermaid
 flowchart LR

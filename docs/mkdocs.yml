@@ -18,6 +18,7 @@ nav:
   - Home: index.md
   - Getting Started: getting-started.md
   - Concepts:
+      - Data Journey: concepts/data-journey.md
       - Architecture: concepts/architecture.md
       - Credentials: credentials.md
       - Authentication: authentication.md

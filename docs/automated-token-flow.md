@@ -1,6 +1,6 @@
 # Automated Token Flow
 
-End-to-end flow for multi-tenant BYOVA apps.
+End-to-end flow for multi-tenant BYOVA apps. For the full five-phase journey including administrator onboarding and live media sessions, see the [BYOVA Data Journey](concepts/data-journey.md).
 
 ```mermaid
 sequenceDiagram

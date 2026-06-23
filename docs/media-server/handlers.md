@@ -29,3 +29,12 @@ Sync handlers are supported via `asyncio.to_thread`.
 - `await session.play_prompt(...)` — delegates to active turn
 - `await session.collect_input(...)`
 - `await session.end_session(reason=)`
+
+## Escalation and session end
+
+When a caller should be transferred to a human agent, the BYOVA protocol uses a **`TRANSFER_TO_AGENT`** output event. A normal virtual-agent hang-up uses **`SESSION_END`**. See [BYOVA Data Journey — Phase 5](../concepts/data-journey.md#phase-5) for the full session lifecycle and escalation context.
+
+- `await session.end_session(reason=)` — end the virtual agent session from your handler
+- `session_end` handler event — fired when Webex terminates the session
+
+Protocol-level output events are documented in [Protocol Notes](protocol-notes.md).

@@ -25,7 +25,7 @@ Media server settings load separately via `MediaServerConfig.from_env()` or `BYO
 
 ## Media server (optional)
 
-Used by `MediaServerConfig.from_env()` and `BYOVAMediaServer.from_env()`. Requires `pip install webex-byova[media]`.
+Used by `MediaServerConfig.from_env()` and `BYOVAMediaServer.from_env()`. Requires `pip install "webex-byova[media]"`.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
