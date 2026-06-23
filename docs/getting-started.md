@@ -7,7 +7,7 @@ The SDK supports two complementary integration paths:
 | **BYODS REST** | Register data sources, ingest call metadata, schema-driven integrations | `BYOVA` client |
 | **BYOVA media** | Host a voice virtual agent — prompts, caller audio, DTMF, multi-turn dialogs | `BYOVAMediaServer` |
 
-Most production BYOVA apps use **both**: REST APIs for provisioning and webhooks, plus the gRPC media server for live call handling. See [Architecture](concepts/architecture.md) and [Deployment](media-server/deployment.md#coexistence-with-byods).
+Most production BYOVA apps use **both**: REST APIs for provisioning and webhooks, plus the gRPC media server for live call handling. For the full end-to-end workflow (portal setup through live calls), see the [BYOVA Data Journey](concepts/data-journey.md). See also [Architecture](concepts/architecture.md) and [Deployment](media-server/deployment.md#coexistence-with-byods).
 
 ## Prerequisites
 
@@ -121,6 +121,7 @@ See [Media Server Quickstart](media-server/quickstart.md) for the full walkthrou
 
 ### BYODS and platform
 
+- [BYOVA Data Journey](concepts/data-journey.md) — end-to-end workflow from portal setup to live calls
 - [Architecture](concepts/architecture.md) — two-tier credentials and async conventions
 - [Automated Token Flow](automated-token-flow.md) — end-to-end multi-tenant sequence
 - [Webhooks](guides/webhooks.md) — handle authorized/deauthorized events

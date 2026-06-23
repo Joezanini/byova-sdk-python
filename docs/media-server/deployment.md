@@ -3,7 +3,7 @@
 ## Requirements
 
 - Python ≥3.10
-- `pip install webex-byova[media]`
+- `pip install "webex-byova[media]"`
 - Network access from Webex Contact Center to your server port
 
 ## TLS

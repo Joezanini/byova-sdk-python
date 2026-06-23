@@ -49,6 +49,7 @@ from webex_byova.media import BYOVAMediaServer, MediaServerConfig
 
 ## Related docs
 
+- [BYOVA Data Journey](../concepts/data-journey.md) — end-to-end workflow including live sessions
 - [Getting Started](../getting-started.md#run-a-media-server-voice) — prerequisites and first server
 - [Architecture](../concepts/architecture.md#byova-media-server-optional) — how media fits with BYODS
 - [Environment variables](../guides/environment-variables.md#media-server-optional) — `WEBEX_MEDIA_*` settings

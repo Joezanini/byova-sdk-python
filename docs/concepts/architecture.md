@@ -2,6 +2,8 @@
 
 The SDK is built around a **two-tier credential model**, **async-first** API design, and an optional **gRPC media server** for live BYOVA voice sessions.
 
+For the operational workflow — how portal registration, org tokens, data sources, Flow Designer onboarding, and live sessions connect — see the [BYOVA Data Journey](data-journey.md).
+
 ## Two-tier credentials
 
 ```mermaid

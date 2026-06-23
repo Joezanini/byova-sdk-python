@@ -40,6 +40,7 @@ pip install "webex-byova[media]"
 
 | Topic | Guide |
 |-------|-------|
+| **End-to-end workflow** | [BYOVA Data Journey](concepts/data-journey.md) |
 | First steps | [Getting Started](getting-started.md) |
 | How it fits together | [Architecture](concepts/architecture.md) |
 | OAuth flow | [Integration OAuth](integration-oauth.md) |
